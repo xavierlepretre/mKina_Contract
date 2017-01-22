@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base href="." />
+    <title>Remittances</title>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link href="./app.css" rel='stylesheet' type='text/css'>
+    <script src="./angular.js"></script>
+    <script src="./app.js"></script>
+    <script src="./remittance.js"></script>
+</head>
+<body ng-app="remittanceApp" ng-controller="remittanceListController">
+    <h1><a ng-href="https://testnet.etherscan.io/address/{{ remittancesAddress }}">Remittances</a></h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Sender</th>
+                <th>Value in Finney</th>
+                <th>Value in Toea</th>
+                <th>Status</th>
+                <th>Actions</th>
+                <th>Deadline<br/>{{ currentBlock }}</th>
+                <th>Hash</th>
+                <th>Agent Code</th>
+                <th>Receiver Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="remittance in remittancesObject"
+            ng-class="{ adding: remittance.adding, collecting: remittance.collecting, returning: remittance.returning }">
+                <td><pre>{{ remittance.sender }}</pre></td>
+                <td>{{ remittance.value }}</td>
+                <td>{{ remittance.toea }}</td>
+                <td>{{ remittance.status }}</td>
+                <td>
+                    <button id="test" ng-click="returnRemittance(remittance.hash)">Return</button>
+                </td>
+                <td>{{ remittance.blockDeadline }}</td>
+                <td><pre>{{ remittance.hash }}</pre></td>
+                <td><pre>{{ remittance.agentCode }}</pre></td>
+                <td><pre>{{ remittance.receiverCode }}</pre></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>You have <span class="black"><span id="balance">{{ balance }}</span> Finneys</span></h3>
+
+    <br>
+    <fieldset>
+        <legend>Send</legend>
+
+        <label for="amount">Amount in Finneys:</label><br/>
+        <input type="text" id="amount" placeholder="e.g., 200" ng-model="amount"></input><br/>
+
+        <label for="amountToea">Amount in Toeas:</label><br/>
+        <input type="text" id="amountToea" placeholder="e.g., 640" ng-model="amountToea"></input><br/>
+
+        <label for="agentCode">Agent Code, 8 bytes in hex:</label><br/>
+        <input type="text" id="agentCode" placeholder="0x1234abc" ng-model="newRemittance.agentCode"></input><br/>
+        
+        <label for="receiverCode">Receiver Code, 8 bytes in hex:</label><br/>
+        <input type="text" id="receiverCode" placeholder="0x1234abc" ng-model="newRemittance.receiverCode"></input><br/>
+        
+        <label for="blockDeadline">Future block deadline:</label><br/>
+        <input type="text" id="blockDeadline" placeholder="1000000" ng-model="newRemittance.blockDeadline"></input><br/>
+        
+        <button id="send" ng-click="sendRemittance(amount, amountToea, newRemittance.agentCode, newRemittance.receiverCode, newRemittance.blockDeadline)">Send</button>
+    </fieldset>
+
+    <fieldset>
+        <legend>Collect</legend>
+
+        <label for="agentCodeCollect">Agent Code, 8 bytes in hex:</label><br/>
+        <input type="text" id="agentCodeCollect" placeholder="0x1234abc" ng-model="collectRemittance.agentCode"></input><br/>
+        
+        <label for="receiverCodeCollect">Receiver Code, 8 bytes in hex:</label><br/>
+        <input type="text" id="receiverCodeCollect" placeholder="0x1234abc" ng-model="collectRemittance.receiverCode"></input><br/>
+
+        <button id="collect" ng-click="collectRemittance(collectRemittance.agentCode, collectRemittance.receiverCode)">Collect</button>
+        <button id="test" ng-click="testRemittance(collectRemittance.agentCode, collectRemittance.receiverCode)">Test</button>
+
+        <p>Calculated hash: {{ collectRemittance.hash }}</p>
+    </fieldset>
+
+    <pre>1000 Finney &lt;-&gt; 1 Ether &lt;-&gt; 10 USD &lt;-&gt; 32 PKG &lt;-&gt; 3200 Toea</pre>
+</body>
+</html>
